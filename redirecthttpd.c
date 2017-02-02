@@ -23,7 +23,7 @@ void failQuit(char *message) {
 }
 
 int main(int argc, char **argv) {
-    char headers[256];
+    char headers[255];
     unsigned int forks=0;
     int s;
     if ((s = socket(PF_INET6, SOCK_STREAM, 0)) < 0)
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
     sa.sin6_port = htons(80);
     sa.sin6_addr = in6addr_any;
     if ((bind(s, (struct sockaddr *)&sa, sizeof sa)) < 0) {
-        failQuit("Unable to open port: ");
+        failQuit("Unable to open port: 80");
     }
     setsockopt(s, IPPROTO_TCP, TCP_NODELAY | SO_REUSEPORT, NULL, 0);
     setsockopt(s, IPPROTO_TCP, SO_LINGER, 0, 1);
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
     while (1) {
         /* accept() blocks until it gets a client. */
         client = accept(s, (struct sockaddr *)&sa, &sz);
-        unsigned char len = read (client, headers, sizeof(headers));
+        unsigned char len = read(client, headers, sizeof(headers));
         char *host = headers;
         for (int byte=0; byte != len; byte++) {
             if (headers[byte] == ':') {
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
             } 
         }
         for (int byte=0; byte != len; byte++) {
-            if (host[byte] == 0x0D) {
+            if (host[byte] == 0x0D || host[byte] == 0x0A) {
                 host[byte] = 0;
                 break;
             } 
